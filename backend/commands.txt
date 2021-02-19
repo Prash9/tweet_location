@@ -1,0 +1,1 @@
+docker run -v `pwd`:/usr/src/app -p 5050:5050 --network=kafkaproject_default tweet_consumer
