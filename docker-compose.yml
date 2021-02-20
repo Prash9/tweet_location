@@ -6,7 +6,8 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
-  
+    volumes:
+      - /var/lib/data/zk-data:/opt/zookeeper-3.4.13/data
   kafka:
     image: wurstmeister/kafka
     container_name: kafka
@@ -19,3 +20,21 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
       - /var/lib/data/kafka-data/node1:/kafka
+    depends_on:
+      - zookeeper
+  consumer:
+    build: ./consumer
+    container_name: consumer
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./consumer:/usr/src/app
+    depends_on:
+      - kafka
+  producer:
+    build: ./producer
+    container_name: producer
+    volumes:
+      - ./producer:/usr/src/app
+    depends_on:
+      - kafka

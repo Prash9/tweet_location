@@ -1,0 +1,9 @@
+pip freeze | grep -v pkg-resources > requirements.txt
+
+docker build --rm -t tweet_consumer .
+docker build --rm -t tweet_producer .
+
+docker run -v `pwd`:/usr/src/app -p 5050:5050 --network=kafkaproject_default tweet_consumer
+docker run -v `pwd`:/usr/src/app --network=kafkaproject_default tweet_producer
+
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic twitterstream

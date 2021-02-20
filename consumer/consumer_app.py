@@ -1,4 +1,4 @@
-from flask import Flask,request,jsonify,Response
+from flask import Flask,request,jsonify,Response,render_template
 import json
 from pykafka.common import OffsetType
 
@@ -10,7 +10,7 @@ app=Flask(__name__)
 
 @app.route("/")
 def index():
-    return "Welcome to home page"
+    return render_template("index.html")
 
 @app.route("/topic/<topicname>")
 def topic_consumer(topicname):
@@ -23,11 +23,9 @@ def topic_consumer(topicname):
         for msg in client.topics[topicname].get_simple_consumer(consumer_group="consumer_group",
                     auto_offset_reset=OffsetType.LATEST,
                     reset_offset_on_start=True):
-            yield f"{msg.value.decode('utf-8')}"
-            # data=consumer.consume()
-            # print(data)
-    return Response(events(),mimetype="text/event-stream")
-    # return "Success"
+            #new line character is mandatory for server side events
+            yield 'data: %s\n\n' % msg.value.decode('utf-8')
+    return Response(events(),mimetype='text/event-stream')
 
 if __name__=="__main__":
     app.run("0.0.0.0",port=5050,debug=True)
